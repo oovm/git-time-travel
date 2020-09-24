@@ -1,7 +1,10 @@
 (* ::Package:: *)
 
 SetDirectory@NotebookDirectory[];
-all = Sort@RandomInteger[UnixTime /@ {DateObject[{2020, 4, 20}], Now}, 18];
+all = Sort@RandomInteger[UnixTime /@ {
+    DateObject[{2020, 4, 1}], 
+    DateObject[{2020, 4, 15}]
+}, 18];
 log[unix_] := TemplateApply["\
 $commitDateString = \"``\"
 $env:GIT_COMMITTER_DATE = $commitDateString

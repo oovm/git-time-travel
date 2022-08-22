@@ -22,24 +22,30 @@ Export["time-travel.ps1", powershell, "Text"]
 
 
 
-(* ::Package:: *)
-(* git rebase -i --root *)
-SetDirectory@NotebookDirectory[];
-all = Sort@RandomInteger[UnixTime /@ {
-    DateObject[{2021,7, 27}], 
-    DateObject[{2021,8, 10}]
-}, 19];
-log[unix_] := TemplateApply["\
+rewriteUnix[commits_Integer, start_DateObject] := rewriteUnix[commits, start, DayPlus[start, commits]]
+rewriteUnix[commits_Integer, start_DateObject, end_DateObject] := Block[
+    {
+        all, log, last
+    },
+    all = Sort@RandomInteger[UnixTime /@ {start, end}, commits];
+    log[unix_] := TemplateApply["\
 commitDateString=\"``\"
 GIT_COMMITTER_DATE=$commitDateString git commit --amend --no-edit --date $commitDateString
 git rebase --continue
-", {DateString[FromUnixTime[unix], "ISODateTime"]}
-];
-last="
+",
+        {
+            DateString[FromUnixTime[unix], "ISODateTime"]
+        }
+    ];
+    last = "
 GIT_COMMITTER_DATE=\"\"
 ";
+    StringRiffle[log /@ all, "\n"] <> last
+];
 
-powershell = StringRiffle[log /@ all, "\n"]<>last;
 
-powershell // CopyToClipboard
+(* git rebase -i --root *)
+SetDirectory@NotebookDirectory[];
+powershell = rewriteUnix[26, DateObject[{2019, 3, 22}]];
+powershell // CopyToClipboard;
 Export["time-travel.sh", powershell, "Text"]

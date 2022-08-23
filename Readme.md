@@ -9,3 +9,10 @@ git reset Head~20 -i # 开启交互式变基
 # 然后把 pick 全部替换成 edit 并关闭 editor
 # 直接执行 time-travel.ps1 即可
 ```
+
+## git
+
+```sh
+git config --global alias.retime "git-retime"
+git retime 2a990148 2019-01-01
+```

@@ -14,5 +14,12 @@ git reset Head~20 -i # 开启交互式变基
 
 ```sh
 git config --global alias.retime "git-retime"
-git retime 2a990148 2019-01-01
+git-retime 2a990148 2019-01-01
+```
+
+
+## Development
+
+```sh
+cargo install --path .
 ```

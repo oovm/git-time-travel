@@ -1,12 +1,11 @@
-use std::path::PathBuf;
 use std::process::Command;
-use git2::{Error, Oid, Repository, Signature, Sort, Time};
+use git2::{Error, RebaseOptions, Repository, Signature, Sort, Time};
 use clap::Parser;
 
 #[test]
 fn test() {
     let repo = find_closest_git_repo().unwrap();
-    let c = modify_commit("dd99ab69", &repo);
+    let c = modify_commit("88ac480a", &repo, &[Time::new(622505600, 0), Time::new(622505600, 0), Time::new(622505600, 0), Time::new(622505600, 0)]);
     println!("count: {:?}", c);
 }
 
@@ -22,23 +21,59 @@ pub struct GitTimeTravel {
     end: Option<String>,
 }
 
-fn modify_commit(hash: &str, repo: &Repository) -> Result<(), Error> {
-    // let mut signature = repo.signature()?;
-    let new_date = Time::new(1622505600, 0); // 设置新的时间戳
-    let new_author = Signature::now("New Author", "new.author@example.com")?; // 设置新的作者
-    let id = Oid::from_str(hash)?;
-    let update_ref = Some(id.to_string());
-    let commit = repo.find_commit(id)?;
-    let message = commit.message();
-    commit.amend(
-        update_ref.map(|s| s.as_str()),
-        Some(&new_author), // 设置新的作者
-        Some(&new_author), // 设置新的提交者
-        None, // 不修改 message
-        message, // 不修改 message
-        None, // 不修改 tree
-    )?;
+// modify all commits from hash to head's time to date
+fn modify_commit(hash: &str, repo: &Repository, dates: &[Time]) -> Result<(), Error> {
+    let id = repo.revparse_single(hash)?.id();
+    let annotated = repo.find_annotated_commit(id)?;
+    let mut rebase_options = RebaseOptions::new();
+    rebase_options.inmemory(true);
+    let mut rebase = repo.rebase(None, Some(&annotated), None, Some(&mut rebase_options))?;
+    let mut dates = dates.iter();
+    while let Some(operation) = rebase.next() {
+        let commit = repo.find_commit(operation?.id())?;
+        let mut author = commit.author();
+        let mut committer = commit.committer();
+
+        // Update the author and committer dates
+        match dates.next() {
+            Some(s) => {
+                author = new_sign(author, *s)?;
+                committer = new_sign(committer, *s)?;
+            }
+            None => {
+                println!("rest {} commits will be ignored", rebase.len());
+                break;
+            }
+        }
+        let mut parents = commit.parents().collect::<Vec<_>>();
+        // Ensure the current tip is the first parent before creating the commit
+        if let Some(first_parent) = parents.get(0) {
+            if repo.head()?.peel_to_commit()?.id() == first_parent.id() {
+                let _ = repo.commit(
+                    Some("HEAD"),
+                    &author,
+                    &committer,
+                    commit.message().unwrap_or(""),
+                    &commit.tree()?,
+                    &parents.iter().map(|s| s).collect::<Vec<_>>(),
+                )?;
+            } else {
+                println!("Failed to create commit: current tip is not the first parent");
+            }
+        }
+        // Finish the rebase
+        rebase.commit(Some(&author), &committer, commit.message())?;
+    }
+
+    rebase.finish(None)?;
     Ok(())
+}
+
+
+fn new_sign(old: Signature, date: Time) -> Result<Signature, Error> {
+    let name = String::from_utf8_lossy(old.name_bytes());
+    let email = String::from_utf8_lossy(old.email_bytes());
+    Signature::new(name.as_ref(), email.as_ref(), &date)
 }
 
 
@@ -55,16 +90,6 @@ impl GitTimeTravel {
         Ok(())
     }
 }
-
-#[test]
-fn test2() {
-    GitTimeTravel {
-        commit: "".to_string(),
-        start: "".to_string(),
-        end: None,
-    }.run();
-}
-
 
 // Function to find the closest git repository in ancestors and return the Repository object
 fn find_closest_git_repo() -> Result<Repository, Error> {
@@ -84,7 +109,7 @@ fn find_closest_git_repo() -> Result<Repository, Error> {
 }
 
 // Function to count commits between a commit and HEAD
-fn count_commits_between(commit: &str, repo: &Repository) -> Result<usize, Error> {
+pub fn count_commits_between(commit: &str, repo: &Repository) -> Result<usize, Error> {
     let mut count = 0;
     let mut revwalk = repo.revwalk()?;
     revwalk.push_head()?;

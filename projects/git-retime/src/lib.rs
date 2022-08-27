@@ -1,12 +1,12 @@
 use std::path::PathBuf;
 use std::process::Command;
-use git2::{Error, Oid, Repository, Sort};
+use git2::{Error, Oid, Repository, Signature, Sort, Time};
 use clap::Parser;
 
 #[test]
 fn test() {
     let repo = find_closest_git_repo().unwrap();
-    let c = count_commits_between("dd99ab69", &repo);
+    let c = modify_commit("dd99ab69", &repo);
     println!("count: {:?}", c);
 }
 
@@ -21,6 +21,26 @@ pub struct GitTimeTravel {
     #[arg(short, long, value_name = "FILE")]
     end: Option<String>,
 }
+
+fn modify_commit(hash: &str, repo: &Repository) -> Result<(), Error> {
+    // let mut signature = repo.signature()?;
+    let new_date = Time::new(1622505600, 0); // 设置新的时间戳
+    let new_author = Signature::now("New Author", "new.author@example.com")?; // 设置新的作者
+    let id = Oid::from_str(hash)?;
+    let update_ref = Some(id.to_string());
+    let commit = repo.find_commit(id)?;
+    let message = commit.message();
+    commit.amend(
+        update_ref.map(|s| s.as_str()),
+        Some(&new_author), // 设置新的作者
+        Some(&new_author), // 设置新的提交者
+        None, // 不修改 message
+        message, // 不修改 message
+        None, // 不修改 tree
+    )?;
+    Ok(())
+}
+
 
 impl GitTimeTravel {
     pub fn run(&self) -> Result<(), Error> {

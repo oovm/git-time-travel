@@ -2,6 +2,7 @@
 use clap::Parser;
 
 mod rebase;
+mod errors;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]

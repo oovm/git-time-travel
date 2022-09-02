@@ -10,8 +10,8 @@ pub struct GitTimeTravel {
     /// commit hash
     commit: String,
     /// start date
-    start: String,
+    start_date: String,
     /// end date
-    #[arg(short, long, value_name = "FILE")]
-    end: Option<String>,
+    #[arg(short, long, value_name = "END")]
+    end_date: Option<String>,
 }

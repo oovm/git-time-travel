@@ -12,6 +12,8 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.0.32", features = ["derive"] }
 git2 = "0.16.0"
+chrono = "0.4.23"
+rand = { version = "0.8.5", features = [] }
 
 [dev-dependencies]
 

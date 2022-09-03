@@ -1,6 +1,6 @@
 [package]
 name = "git-retime"
-version = "0.0.0"
+version = "0.1.0"
 authors = ["Aster <192607617@qq.com>"]
 description = "Rewrite git commit time in history"
 repository = "https://github.com/oovm/git-time-travel"

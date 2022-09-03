@@ -19,7 +19,7 @@ pub fn find_closest_git_repo() -> Result<Repository, Error> {
 
 // Function to count commits between a commit and HEAD
 pub fn count_commits_from(id: Oid, repo: &Repository) -> Result<usize, Error> {
-    let mut count = 0;
+    let mut count: usize = 0;
     let mut revwalk = repo.revwalk()?;
     revwalk.push_head()?;
     revwalk.set_sorting(Sort::TIME)?;
@@ -30,7 +30,7 @@ pub fn count_commits_from(id: Oid, repo: &Repository) -> Result<usize, Error> {
             break;
         }
         count += 1;
-    }
-
+    };
+    // count = count.saturating_sub(1);
     Ok(count)
 }

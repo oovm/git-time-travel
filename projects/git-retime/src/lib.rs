@@ -1,4 +1,3 @@
-
 use clap::Parser;
 
 mod rebase;
@@ -8,12 +7,14 @@ mod utils;
 #[command(author, version, about, long_about = None)]
 pub struct GitTimeTravel {
     /// commit hash
-    commit: String,
+    pub commit: String,
     /// start date
-    start_date: String,
+    pub start_date: String,
     /// end date
     #[arg(short, long, value_name = "END")]
-    end_date: Option<String>,
+    pub end_date: Option<String>,
     #[arg(short, long, value_name = "BRANCH")]
-    branch: Option<String>,
+    pub branch: Option<String>,
 }
+
+

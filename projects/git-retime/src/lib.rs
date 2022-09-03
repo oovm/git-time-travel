@@ -2,7 +2,7 @@
 use clap::Parser;
 
 mod rebase;
-mod errors;
+mod utils;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -14,4 +14,6 @@ pub struct GitTimeTravel {
     /// end date
     #[arg(short, long, value_name = "END")]
     end_date: Option<String>,
+    #[arg(short, long, value_name = "BRANCH")]
+    branch: Option<String>,
 }

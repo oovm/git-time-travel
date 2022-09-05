@@ -30,7 +30,7 @@ pub fn count_commits_from(id: Oid, repo: &Repository) -> Result<usize, Error> {
             break;
         }
         count += 1;
-    };
+    }
     // count = count.saturating_sub(1);
     Ok(count)
 }

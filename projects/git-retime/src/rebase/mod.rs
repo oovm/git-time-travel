@@ -1,15 +1,5 @@
-use std::collections::VecDeque;
-
+use crate::{errors::find_closest_git_repo, GitTimeTravel};
 use git2::{Error, IndexAddOption, RebaseOptions, Repository, Signature, Sort, Time};
-use crate::errors::find_closest_git_repo;
-use crate::GitTimeTravel;
-
-#[test]
-fn test() {
-    let repo = find_closest_git_repo().unwrap();
-    let c = modify_commit("69b31666", &repo, &[Time::new(622505600, 0), Time::new(622505600, 0), Time::new(622505600, 0), Time::new(622505600, 0)]);
-    println!("count: {:?}", c);
-}
 
 // modify all commits from hash to head's time to date
 fn modify_commit(hash: &str, repo: &Repository, dates: &[Time]) -> Result<(), Error> {
@@ -51,17 +41,14 @@ fn modify_commit(hash: &str, repo: &Repository, dates: &[Time]) -> Result<(), Er
     let sig = repo.signature()?;
     repo.commit(Some("HEAD"), &sig, &sig, "Update commit dates", &tree, &[&parent_commit])?;
 
-
     Ok(())
 }
-
 
 fn new_sign(old: Signature, date: Time) -> Result<Signature, Error> {
     let name = String::from_utf8_lossy(old.name_bytes());
     let email = String::from_utf8_lossy(old.email_bytes());
     Signature::new(name.as_ref(), email.as_ref(), &date)
 }
-
 
 impl GitTimeTravel {
     pub fn run(&self) -> Result<(), Error> {
@@ -89,4 +76,3 @@ impl GitTimeTravel {
         Ok(count)
     }
 }
-

@@ -18,5 +18,3 @@ pub struct GitTimeTravel {
     #[arg(short, long, value_name = "BRANCH")]
     pub branch: Option<String>,
 }
-
-

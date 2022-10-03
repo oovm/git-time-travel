@@ -3,10 +3,10 @@ use clap::Parser;
 mod rebase;
 mod utils;
 
-/// Configs for `git-root`
+/// Configs for `git-retime`
 #[derive(Parser)]
 #[command(author, version, about, long_about = include_str!("../readme.md"))]
-pub struct GitRootCommit {
+pub struct GitTimeTravel {
     /// commit hash
     pub commit: String,
     /// start date

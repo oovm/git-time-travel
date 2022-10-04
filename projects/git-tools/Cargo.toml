@@ -1,6 +1,6 @@
 [package]
-name = "git-tools"
-version = "0.1.0"
+name = "git-utils"
+version = "0.0.0"
 authors = ["Aster <192607617@qq.com>"]
 description = "Rewrite git commit time in history"
 repository = "https://github.com/oovm/git-time-travel"

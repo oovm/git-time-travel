@@ -1,7 +1,6 @@
 use clap::Parser;
 
 mod rebase;
-mod utils;
 
 /// Configs for `git-root`
 #[derive(Parser)]

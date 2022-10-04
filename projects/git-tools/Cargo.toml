@@ -4,15 +4,13 @@ version = "0.1.0"
 authors = ["Aster <192607617@qq.com>"]
 description = "Rewrite git commit time in history"
 repository = "https://github.com/oovm/git-time-travel"
-documentation = "https://docs.rs/git-retime"
+documentation = "https://docs.rs/git-tools"
 readme = "readme.md"
 license = "MPL-2.0"
 edition = "2021"
 
 [dependencies]
 git2 = "0.16.0"
-chrono = "0.4.23"
-rand = { version = "0.8.5", features = [] }
 
 [dev-dependencies]
 

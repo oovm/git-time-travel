@@ -1,20 +1,9 @@
-use clap::Parser;
-
 mod rebase;
+mod repos;
 mod utils;
 
-/// Configs for `git-retime`
-#[derive(Parser)]
-#[command(author, version, about, long_about = include_str!("../readme.md"))]
-pub struct GitTimeTravel {
-    /// commit hash
-    pub commit: String,
-    /// start date
-    pub start_date: String,
-    /// end date, default is `start date + commit count`
-    #[arg(short, long, value_name = "END")]
-    pub end_date: Option<String>,
-    /// custom branch name, default is `time-travel`
-    #[arg(short, long, value_name = "BRANCH")]
-    pub branch: Option<String>,
-}
+use git2::Error;
+
+pub type GitResult<T = ()> = Result<T, Error>;
+
+pub use crate::repos::find_closest_git_repo;

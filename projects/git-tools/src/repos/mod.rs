@@ -1,5 +1,5 @@
 use crate::GitResult;
-use git2::{Error, Repository};
+use git2::{Commit, Error, Repository, Sort};
 
 // Function to find the closest git repository in ancestors and return the Repository object if exists.
 pub fn find_closest_git_repo() -> GitResult<Repository> {
@@ -16,4 +16,18 @@ pub fn find_closest_git_repo() -> GitResult<Repository> {
         }
     }
     Err(Error::from_str("No git repository found"))
+}
+
+pub fn find_initial_commit(repo: &Repository) -> GitResult<Commit> {
+    let mut revwalk = repo.revwalk()?;
+    revwalk.push_head()?;
+    revwalk.set_sorting(Sort::TIME)?;
+    for oid in revwalk {
+        let oid = oid?;
+        let commit = repo.find_commit(oid)?;
+        if commit.parent_count() == 0 {
+            return Ok(commit);
+        }
+    }
+    Err(Error::from_str("No initial commit found"))
 }

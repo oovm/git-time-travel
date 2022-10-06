@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - run: git config --global core.autocrlf false
+      - run: git-utils config --global core.autocrlf false
       - uses: actions/checkout@v2
       - name: Rust Nightly
         uses: actions-rs/toolchain@v1

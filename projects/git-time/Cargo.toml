@@ -1,8 +1,8 @@
 [package]
-name = "git-rehead"
+name = "git-time"
 version = "0.1.0"
 authors = ["Aster <192607617@qq.com>"]
-description = "Rewrite git root commit"
+description = "Rewrite git commit time in history"
 repository = "https://github.com/oovm/git-time-travel"
 documentation = "https://docs.rs/git-retime"
 readme = "readme.md"
@@ -14,10 +14,6 @@ clap = { version = "4.0.32", features = ["derive"] }
 git2 = "0.16.0"
 chrono = "0.4.23"
 rand = { version = "0.8.5", features = [] }
-
-[dependencies.git-utils]
-# version = "0.1.0"
-path = "../git-tools"
 
 [dev-dependencies]
 

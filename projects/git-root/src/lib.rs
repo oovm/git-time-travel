@@ -2,7 +2,7 @@ use clap::Parser;
 
 mod rebase;
 
-/// Configs for `git-root`
+/// Configs for `git-utils-root`
 #[derive(Parser)]
 #[command(author, version, about, long_about = include_str!("../readme.md"))]
 pub struct GitRootCommit {

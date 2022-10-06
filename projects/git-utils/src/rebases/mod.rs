@@ -13,7 +13,7 @@ use std::{
 };
 
 pub struct GitCleaner {
-    /// The git repository to clean.
+    /// The git-utils repository to clean.
     repo: Repository,
     /// size to purge
     purge_size: Option<usize>,
@@ -86,7 +86,7 @@ impl GitCleaner {
             &[&old_commit],
         )?;
         // Update the new branch reference to point to the new commit
-        new_branch.set_target(new_commit_oid, "Update new branch after purge")?;
+        // new_branch.set_target(new_commit_oid, "Update new branch after purge")?;
         Ok(new_branch)
     }
 

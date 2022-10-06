@@ -1,5 +1,4 @@
 mod commits;
-mod rebase;
 mod rebases;
 mod repos;
 
@@ -8,3 +7,5 @@ pub use crate::{
     repos::{find_closest_git_repo, find_initial_commit},
 };
 mod errors;
+
+pub use crate::errors::GitResult;

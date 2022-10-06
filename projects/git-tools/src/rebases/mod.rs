@@ -1,7 +1,7 @@
-use crate::GitResult;
+use crate::{errors::runtime_error, GitResult};
 use git2::{
-    Branch, BranchType, Commit, Error, ErrorClass, ErrorCode, Index, IndexAddOption, IndexEntry, IndexEntryUpdate, IndexTime,
-    ObjectType, Oid, Repository, RepositoryInitMode, RepositoryInitOptions, Signature, TreeEntry,
+    Branch, BranchType, Commit, Error, ErrorClass, ErrorCode, Index, IndexAddOption, IndexEntry, IndexTime, ObjectType, Oid,
+    Repository, RepositoryInitMode, RepositoryInitOptions, Signature, TreeEntry,
 };
 use globset::{Glob, GlobSet, GlobSetBuilder};
 use std::{
@@ -21,8 +21,8 @@ pub struct GitCleaner {
 }
 
 impl GitCleaner {
-    pub fn new(repo: Repository) -> Self {
-        Self { repo: repo.clone(), purge_size: None, purge_path: GlobSet::empty() }
+    pub fn new(project: Repository) -> Self {
+        Self { repo: project, purge_size: None, purge_path: GlobSet::empty() }
     }
     pub fn set_max_size(&mut self, size: usize) {
         if size == 0 {
@@ -45,9 +45,7 @@ impl GitCleaner {
             }
         }
         match set.build() {
-            Ok(o) => {
-                self.purge_path = o;
-            }
+            Ok(o) => self.purge_path = o,
             Err(e) => runtime_error(e.to_string())?,
         }
         Ok(())
@@ -64,12 +62,13 @@ impl GitCleaner {
     /// * `new`: create new branch name
     fn prune(&mut self, old: &str, start: Oid, new: &str) -> Result<Branch, Error> {
         let old_branch = self.repo.find_branch(old, BranchType::Local)?;
-        let new_branch = self.repo.branch(new, &old_branch.get().peel_to_commit()?, true)?;
+        let target = old_branch.get().peel_to_commit()?;
+        let new_branch = self.repo.branch(new, &target, true)?;
         let old_tree = old_branch.get().peel_to_tree()?;
         let mut tree_builder = self.repo.treebuilder(Some(&old_tree))?;
         // Iterate through the old tree entries
         for entry in old_tree.iter() {
-            if let Some(path) = self.should_remove(&entry) {
+            if let Ok(path) = self.should_remove(&entry) {
                 tree_builder.remove(path)?;
             }
         }

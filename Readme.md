@@ -13,8 +13,8 @@ git-utils reset Head~20 -i # 开启交互式变基
 ## git
 
 ```sh
-git-utils config --global alias.retime "git-retime"
-git-utils-time 2a990148 2019-01-01
+git-root "🎂 Project initialized!"
+git-time 2a990148 2019-01-01
 ```
 
 

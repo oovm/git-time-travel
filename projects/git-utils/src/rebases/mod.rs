@@ -6,6 +6,7 @@ use git2::{
 use globset::{Glob, GlobSet, GlobSetBuilder};
 use std::{
     collections::HashSet,
+    ffi::OsStr,
     fs::{File, OpenOptions},
     io::{Read, Write},
     path::Path,
@@ -92,14 +93,19 @@ impl GitCleaner {
 
     pub fn should_remove<'a>(&self, entry: &'a TreeEntry) -> GitResult<&'a [u8]> {
         let object = entry.to_object(&self.repo)?;
-        let file_path = entry.name_bytes();
+        let file_bytes = entry.name_bytes();
+        let file_utf8 = String::from_utf8_lossy(file_bytes);
+        let file_path = Path::new(file_utf8.as_ref());
         // Check if the file matches the purge conditions
-        let should_remove = match self.purge_size {
-            Some(size) => object.size() > size,
-            None => false,
-        } || self.purge_path.is_match(file_path);
+        let should_remove = match self.purge_path.is_match(file_path) {
+            true => true,
+            false => {
+                // TODO: check file size
+                false
+            }
+        };
         if should_remove {
-            return Ok(file_path);
+            return Ok(file_bytes);
         }
         Err(Error::from_str("File does not match purge conditions"))
     }

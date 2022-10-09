@@ -8,14 +8,14 @@ pub fn find_closest_git_repo() -> GitResult<Repository> {
         Err(_) => return Err(Error::from_str("Can not get current directory")),
     };
     loop {
-        if current_dir.join(".git-utils").exists() {
+        if current_dir.join(".git").exists() {
             return Ok(Repository::open(current_dir)?);
         }
         if !current_dir.pop() {
             break;
         }
     }
-    Err(Error::from_str("No git-utils repository found"))
+    Err(Error::from_str("No git repository found"))
 }
 
 pub fn find_initial_commit(repo: &Repository) -> GitResult<Commit> {

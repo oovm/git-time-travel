@@ -19,28 +19,37 @@ pub fn count_commits_from(id: Oid, repo: &Repository) -> GitResult<usize> {
     Ok(count)
 }
 
-/// Reword the root commit of the current branch and create a new branch with the same name.
+/// Reword the root commit of the old branch and create a new branch
 ///
 /// # Arguments
 ///
-/// * `repo`:
-/// * `new_message`:
-/// * `branch_name`:
-///
-/// returns: Result<Branch, Error>
-///
-/// # Examples
-///
-/// ```no_run
-/// # use git_tools::{find_closest_git_repo, reword_root_commit};
-/// let repo = find_closest_git_repo().unwrap();
-/// let new_branch = reword_root_commit(&repo, "new message", "new_branch").unwrap();
-/// ```
-pub fn reword_root_commit<'a>(repo: &'a Repository, new_message: &str, branch_name: &str) -> GitResult<Branch<'a>> {
-    let root = find_initial_commit(repo)?;
-    let root_tree = root.tree()?;
-    let init_id = repo.commit(None, &root.author(), &root.committer(), new_message, &root_tree, &[])?;
-    let init = repo.find_commit(init_id)?;
-    let new = repo.branch(branch_name, &init, false)?;
-    Ok(new)
+/// * `repo`:  The git repository
+/// * `message`:  The initial commit message
+/// * `old`:  The old branch name
+/// * `new`: The new branch name
+pub fn reword_root_commit<'a>(repo: &'a Repository, old: &str, new: &str, message: &str) -> GitResult<Branch<'a>> {
+    // Find the old branch reference
+    let old_branch = repo.find_branch(old, BranchType::Local)?;
+
+    // Get the old branch's commit
+    let old_commit = old_branch.get().peel_to_commit()?;
+
+    // Create a new tree based on the old commit's tree
+    let old_tree = old_commit.tree()?;
+    let new_tree_oid = repo.treebuilder(Some(&old_tree))?.write()?;
+
+    // Create a new commit with the new message and tree
+    let new_commit_oid = repo.commit(
+        Some("HEAD"),
+        &repo.signature()?,
+        &repo.signature()?,
+        message,
+        &repo.find_tree(new_tree_oid)?,
+        &[&old_commit],
+    )?;
+
+    // Create the new branch pointing to the new commit
+    let new_branch = repo.branch(new, &repo.find_commit(new_commit_oid)?, false)?;
+
+    Ok(new_branch)
 }

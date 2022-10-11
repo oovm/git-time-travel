@@ -1,10 +1,12 @@
-use std::collections::BTreeSet;
+use crate::{
+    utils::{count_commits_from, find_closest_git_repo},
+    GitTimeTravel,
+};
 use git2::{Error, Oid, RebaseOptions, Repository, Signature, Time};
-use crate::utils::{count_commits_from, find_closest_git_repo};
-use crate::GitTimeTravel;
+use std::collections::BTreeSet;
 
-use rand::Rng;
 use chrono::{Duration, NaiveDate, NaiveDateTime, NaiveTime};
+use rand::Rng;
 
 use rand::thread_rng;
 
@@ -26,8 +28,8 @@ impl GitTimeTravel {
     }
     fn start_time(&self) -> Result<NaiveDateTime, Error> {
         let date = match NaiveDate::parse_from_str(&self.start_date, "%Y-%m-%d") {
-            Ok(o) => { o }
-            Err(_) => { Err(Error::from_str("date parse failed"))? }
+            Ok(o) => o,
+            Err(_) => Err(Error::from_str("date parse failed"))?,
         };
         Ok(date.and_time(NaiveTime::MIN))
     }
@@ -35,8 +37,8 @@ impl GitTimeTravel {
         match &self.end_date {
             Some(s) => {
                 let date = match NaiveDate::parse_from_str(&s, "%Y-%m-%d") {
-                    Ok(o) => { o }
-                    Err(_) => { Err(Error::from_str("date parse failed"))? }
+                    Ok(o) => o,
+                    Err(_) => Err(Error::from_str("date parse failed"))?,
                 };
                 Ok(date.and_time(NaiveTime::MIN))
             }
@@ -48,16 +50,11 @@ impl GitTimeTravel {
     }
     fn branch_name(&self) -> String {
         match &self.branch {
-            Some(s) => {
-                s.to_string()
-            }
-            None => {
-                "time-travel".to_string()
-            }
+            Some(s) => s.to_string(),
+            None => "time-travel".to_string(),
         }
     }
 }
-
 
 // modify all commits from hash to head's time to date and rebase into a new branch
 fn rebase_to_branch(name: &str, id: Oid, repo: &Repository, dates: &[Time]) -> Result<(), Error> {
@@ -90,7 +87,6 @@ fn rebase_to_branch(name: &str, id: Oid, repo: &Repository, dates: &[Time]) -> R
     repo.branch(name, &target, true)?;
     Ok(())
 }
-
 
 fn new_sign(old: Signature, date: Time) -> Result<Signature, Error> {
     let name = String::from_utf8_lossy(old.name_bytes());

@@ -28,28 +28,11 @@ pub fn count_commits_from(id: Oid, repo: &Repository) -> GitResult<usize> {
 /// * `old`:  The old branch name
 /// * `new`: The new branch name
 pub fn reword_root_commit<'a>(repo: &'a Repository, old: &str, new: &str, message: &str) -> GitResult<Branch<'a>> {
-    // Find the old branch reference
     let old_branch = repo.find_branch(old, BranchType::Local)?;
-
-    // Get the old branch's commit
     let old_commit = old_branch.get().peel_to_commit()?;
-
-    // Create a new tree based on the old commit's tree
     let old_tree = old_commit.tree()?;
-    let new_tree_oid = repo.treebuilder(Some(&old_tree))?.write()?;
-
-    // Create a new commit with the new message and tree
-    let new_commit_oid = repo.commit(
-        Some("HEAD"),
-        &repo.signature()?,
-        &repo.signature()?,
-        message,
-        &repo.find_tree(new_tree_oid)?,
-        &[&old_commit],
-    )?;
-
-    // Create the new branch pointing to the new commit
-    let new_branch = repo.branch(new, &repo.find_commit(new_commit_oid)?, false)?;
-
+    let init_tree = repo.treebuilder(Some(&old_tree))?.write()?;
+    let init_oid = repo.commit(None, &repo.signature()?, &repo.signature()?, message, &repo.find_tree(init_tree)?, &[])?;
+    let new_branch = repo.branch(new, &repo.find_commit(init_oid)?, false)?;
     Ok(new_branch)
 }

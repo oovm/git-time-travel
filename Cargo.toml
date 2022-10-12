@@ -1,7 +1,8 @@
 [workspace]
 members = ["projects/*"]
 default-members = [
-    "projects/git-root",
+    "projects/git-utils",
+    "projects/git-time",
 ]
 exclude = [
     "projects/.DS_Store",

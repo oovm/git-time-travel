@@ -1,6 +1,6 @@
 [package]
-name = "git-time"
-version = "0.1.0"
+name = "git-retime"
+version = "0.1.1"
 authors = ["Aster <192607617@qq.com>"]
 description = "Rewrite git commit time in history"
 repository = "https://github.com/oovm/git-time-travel"
@@ -10,9 +10,9 @@ license = "MPL-2.0"
 edition = "2021"
 
 [dependencies]
-clap = { version = "4.0.32", features = ["derive"] }
-git2 = "0.16.0"
-chrono = "0.4.23"
+clap = { version = "4.2.7", features = ["derive"] }
+git2 = "0.17.1"
+chrono = "0.4.24"
 rand = { version = "0.8.5", features = [] }
 
 [dependencies.git-utils]

@@ -60,22 +60,23 @@ fn rebase_to_branch(name: &str, id: Oid, repo: &Repository, dates: &[Time]) -> R
     rebase_options.inmemory(true);
     let mut last = id;
     let mut rebase = repo.rebase(None, Some(&annotated), None, Some(&mut rebase_options))?;
-    let mut dates = dates.iter();
+    let mut index = 0;
     while let Some(operation) = rebase.next() {
         let commit = repo.find_commit(operation?.id())?;
         let mut author = commit.author();
         let mut committer = commit.committer();
 
         // Update the author and committer dates
-        match dates.next() {
+        match dates.get(index) {
             Some(s) => {
                 author = new_sign(author, *s)?;
                 committer = new_sign(committer, *s)?;
             }
             None => {
-                panic!("Not enough dates provided")
+                println!("Not enough dates provided, need {} but only got {}", index, dates.len());
             }
         }
+        index += 1;
         last = rebase.commit(Some(&author), &committer, commit.message())?;
     }
     rebase.finish(None)?;

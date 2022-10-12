@@ -1,4 +1,4 @@
-use git_retime::GitRootCommit;
+use git_root::GitRootCommit;
 
 #[test]
 fn ready() {

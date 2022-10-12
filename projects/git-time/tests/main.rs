@@ -1,4 +1,4 @@
-use git_time::GitTimeTravel;
+use git_retime::GitTimeTravel;
 
 #[test]
 fn ready() {

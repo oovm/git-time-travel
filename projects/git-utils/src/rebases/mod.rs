@@ -5,7 +5,6 @@ use git2::{
 };
 use globset::{Glob, GlobSet, GlobSetBuilder};
 use std::{
-    collections::HashSet,
     ffi::OsStr,
     fs::{File, OpenOptions},
     io::{Read, Write},

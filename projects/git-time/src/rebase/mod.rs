@@ -1,12 +1,9 @@
-use crate::{
-    utils::{count_commits_from, find_closest_git_repo},
-    GitTimeTravel,
-};
-use git2::{Error, Oid, RebaseOptions, Repository, Signature, Time};
-use std::collections::BTreeSet;
-
+use crate::GitTimeTravel;
 use chrono::{Duration, NaiveDate, NaiveDateTime, NaiveTime};
+use git2::{Error, Oid, RebaseOptions, Repository, Signature, Time};
+use git_utils::{count_commits_from, find_closest_git_repo};
 use rand::Rng;
+use std::collections::BTreeSet;
 
 use rand::thread_rng;
 

@@ -15,6 +15,9 @@ git2 = "0.16.0"
 chrono = "0.4.23"
 rand = { version = "0.8.5", features = [] }
 
+[dependencies.git-utils]
+path = "../git-utils"
+
 [dev-dependencies]
 
 [features]

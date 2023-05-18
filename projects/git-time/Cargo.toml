@@ -16,6 +16,7 @@ chrono = "0.4.24"
 rand = { version = "0.8.5", features = [] }
 
 [dependencies.git-utils]
+version = "0.0.0"
 path = "../git-utils"
 
 [dev-dependencies]
